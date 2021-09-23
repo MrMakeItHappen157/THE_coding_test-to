@@ -41,77 +41,10 @@ app.get('/', async function (req, res) {
   res.status(201).json(test);
 });
 
-const mapSubmissions = (submissions) => {
-  let students_total = 0;
-
-  const storeSubjects = []
-  
-  submissions.forEach(submission => {
-    students_total = students_total + submission.students_total
-    storeSubjects.push(submission.subjects);
-  });
-
-// Using _.flatten() method
-const subjects = _.flatten(storeSubjects);
-
-  return { numberOfSubmissions: submissions.length, students_total, subjects }
-}
-
-const groupInstitutions = (institutions) => {
-  const DBSchema = {};
-
-  institutions.map(institution => {
-    DBSchema[institution.name] = { ...mapSubmissions(institution.Submissions), institution: institution.name }
-  }); 
-
-  return DBSchema
-};
-
-const getHigestStudentRatings = (subjects) => {
-  const { student_rating: higestStudentRating } = subjects.pop();
-  let foundTopSubjects = subjects.filter(subject => subject.student_rating === higestStudentRating)
-  foundTopSubjects = foundTopSubjects.map(subject => subject.name) 
-  
-  return [ ...new Set(foundTopSubjects) ][0]
-}
-
-const storeTopSubjectsByInstituitution = (foundInstitutions) => {
-  const groupedInstutions = groupInstitutions(foundInstitutions);
-
-  Object.values(groupedInstutions).forEach((institutionValues) => {
-    institutionValues.subjects.sort((a, b) => a.student_rating - b.student_rating)
-    const higestStudentRatings = getHigestStudentRatings(institutionValues.subjects)
-
-    institutionValues.topSubject = higestStudentRatings
-  });
-
-  return groupedInstutions
-} 
-
-
 app.get('/institutions', async function (req, res) {
   const institutions = await Institutions.find().populate('Submissions');
 
   res.status(200).json(institutions);
-});
-
-app.post('/seed', async function (req, res) {
-  const importInstitutions = await Institutions.create(institutions);
-
-  const updatedSubmissions = submissions.map(submission => {
-    const foundinstitution = importInstitutions.findIndex(institution => institution.id === submission.institution_id);
-
-    return { ...submission, institution: importInstitutions[foundinstitution]._id }
-  });
-
-  await Submissions.create(updatedSubmissions);
-
-  const foundInstitutions = await Institutions.find().populate('Submissions');
-  const groupedInstutions = storeTopSubjectsByInstituitution(foundInstitutions)
-
-  const topInstitutions = await TopInstitutions.create({ TopInstitutions: groupedInstutions })
-
-  res.status(201).json(topInstitutions);
 });
 
 app.listen(process.env.PORT, function () {
