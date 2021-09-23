@@ -1,0 +1,22 @@
+{
+  "name": "test-thc",
+  "version": "1.0.0",
+  "description": "At Time Higher Education our aim is give the best insights we can into higher education for both students and academics. In this test, we'd like to give you a taste of that and give you the opportunity to show us how you could improve this",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv-parse": "^1.2.0",
+    "dotenv": "^10.0.0",
+    "express": "^4.15.2",
+    "lodash": "^4.17.21",
+    "mongoose": "^6.0.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  }
+}
